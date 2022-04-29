@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  userId   Int       @id @default(autoincrement())
+  userName String
+  email    String    @unique
+  Profile  Profile?
+  Articles Article[]
+}
+
+model Profile {
+  profileId Int    @id @default(autoincrement())
+  user      User   @relation(fields: [userId], references: [userId])
+  userId    Int    @unique
+  avataImg  String
+  nickName  String
+}
+
+/// Article에 대한 설명
+model Article {
+  articleId Int    @id @default(autoincrement())
+  user      User   @relation(fields: [userId], references: [userId])
+  userId    Int
+  title     String
+  content   String
+}
+
+model Author {
+  authorId   Int    @id @default(autoincrement())
+  authorName String
+  books      Book[]
+}
+
+model Publisher {
+  publisherId   Int    @id @default(autoincrement())
+  publisherName String
+  books         Book[]
+}
+
+///암시적 다대다 관계 설정 book-tag
+model Book {
+  bookId      Int       @id @default(autoincrement())
+  title       String
+  author      Author    @relation(fields: [authorId], references: [authorId])
+  authorId    Int
+  publisher   Publisher @relation(fields: [publisherId], references: [publisherId])
+  publisherId Int
+  tags        Tag[]
+}
+
+///암시적 다대다 관계 설정 book-tag
+model Tag {
+  tagId Int    @id @default(autoincrement())
+  label String
+  books Book[]
+}
